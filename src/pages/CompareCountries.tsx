@@ -54,8 +54,12 @@ const CompareCountries = () => {
       }
       setComparisonData(response.data);
     } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert('Invalid request: Please ensure the selected countries are valid.');
+      } else {
+        alert('An error occurred while fetching comparison data. Please try again.');
+      }
       console.error('Error comparing countries:', error);
-      alert('An error occurred while fetching comparison data. Please try again.');
     } finally {
       setLoading(false);
     }
