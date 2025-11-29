@@ -30,6 +30,11 @@ const CompareCountries = () => {
   const [comparisonData, setComparisonData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  const validateCountries = (countries: string[]) => {
+    const validCountries = COUNTRIES;
+    return countries.every((country) => validCountries.includes(country));
+  };
+
   const addCountry = (country: string) => {
     if (!selectedCountries.includes(country) && selectedCountries.length < 5) {
       setSelectedCountries([...selectedCountries, country]);
@@ -45,10 +50,16 @@ const CompareCountries = () => {
       alert('Please select at least two countries to compare.');
       return;
     }
+
+    if (!validateCountries(selectedCountries)) {
+      alert('One or more selected countries are invalid. Please select valid countries.');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await apiService.compareCountries(selectedCountries);
-      if (!response.data || !response.data.countries) {
+      if (!response.data || !response.data.countries || Object.keys(response.data.countries).length === 0) {
         alert('No data available for the selected countries.');
         return;
       }
