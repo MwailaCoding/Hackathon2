@@ -41,13 +41,21 @@ const CompareCountries = () => {
   };
 
   const compareCountries = async () => {
-    if (selectedCountries.length < 2) return;
+    if (selectedCountries.length < 2) {
+      alert('Please select at least two countries to compare.');
+      return;
+    }
     setLoading(true);
     try {
       const response = await apiService.compareCountries(selectedCountries);
+      if (!response.data || !response.data.countries) {
+        alert('No data available for the selected countries.');
+        return;
+      }
       setComparisonData(response.data);
     } catch (error) {
       console.error('Error comparing countries:', error);
+      alert('An error occurred while fetching comparison data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -83,7 +91,7 @@ const CompareCountries = () => {
           ),
         },
         {
-          metric: 'Debt Sust.',
+          metric: 'Debt Sustainability',
           ...Object.fromEntries(
             Object.entries(comparisonData.countries).map(([country, data]: [string, any]) => [
               country,
@@ -143,6 +151,27 @@ const CompareCountries = () => {
         },
       ]
     : [];
+
+  // Enhance chart presentation
+  const chartTooltipStyle = {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    padding: '10px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  };
+
+  const chartLegendStyle = {
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: '#374151',
+  };
+
+  const chartAxisStyle = {
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#6b7280',
+  };
 
   return (
     <div className="space-y-6">
@@ -297,8 +326,8 @@ const CompareCountries = () => {
               <ResponsiveContainer width="100%" height={400}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="#e5e7eb" />
-                  <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
-                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} />
+                  <PolarAngleAxis dataKey="metric" tick={chartAxisStyle} />
+                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={chartAxisStyle} />
                   {Object.keys(comparisonData.countries).map((country, index) => (
                     <Radar
                       key={country}
@@ -310,7 +339,8 @@ const CompareCountries = () => {
                       strokeWidth={2}
                     />
                   ))}
-                  <Legend />
+                  <Legend wrapperStyle={chartLegendStyle} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -320,16 +350,10 @@ const CompareCountries = () => {
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={metricsComparison}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="metric" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                    }}
-                  />
-                  <Legend />
+                  <XAxis dataKey="metric" tick={chartAxisStyle} />
+                  <YAxis tick={chartAxisStyle} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Legend wrapperStyle={chartLegendStyle} />
                   {Object.keys(comparisonData.countries).map((country, index) => (
                     <Bar
                       key={country}

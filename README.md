@@ -1,4 +1,4 @@
-# African Fiscal Analyzer
+# UchumiBora
 
 A comprehensive, colorful web application for analyzing African fiscal and economic data. This platform provides deep insights into government finances, debt sustainability, economic trends, and policy recommendations across African nations.
 
